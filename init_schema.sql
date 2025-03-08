@@ -1,0 +1,1 @@
+CREATE SCHEMA IF NOT EXISTS parking_lot_system;

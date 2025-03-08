@@ -1,0 +1,1 @@
+export type Option = "ParkingLots" | "Clients" | "Vehicles" | "Activities";
