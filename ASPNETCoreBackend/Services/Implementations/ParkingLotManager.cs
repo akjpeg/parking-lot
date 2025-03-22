@@ -13,8 +13,8 @@ namespace ASPNETCoreBackend.Services.Implementations
         private readonly IParkingLotRepository _parkingLotRepository;
         private readonly IParkingLotActivityRepository _parkingLotActivityRepository;
 
-        public ParkingLotManager(IClientRepository clientRepository, 
-                                 IVehicleRepository vehicleRepository, 
+        public ParkingLotManager(IClientRepository clientRepository,
+                                 IVehicleRepository vehicleRepository,
                                  IParkingLotRepository parkingLotRepository,
                                  IParkingLotActivityRepository parkingLotActivityRepository)
         {
@@ -109,7 +109,7 @@ namespace ASPNETCoreBackend.Services.Implementations
 
             if (client != null)
             {
-                client.PhoneNumber = !string.IsNullOrEmpty(clientModel.Phone)? clientModel.Phone : client.PhoneNumber;
+                client.PhoneNumber = !string.IsNullOrEmpty(clientModel.Phone) ? clientModel.Phone : client.PhoneNumber;
                 client.Email = !string.IsNullOrEmpty(clientModel.Email) ? clientModel.Email : client.Email;
 
                 _clientRepository.UpdateClient(client);
@@ -128,7 +128,7 @@ namespace ASPNETCoreBackend.Services.Implementations
             if (parkingLot != null)
             {
                 parkingLot.Address = !string.IsNullOrEmpty(parkingLotModel.Address) ? parkingLotModel.Address : parkingLot.Address;
-                parkingLot.PricePerAdditionalHour = parkingLotModel.PricePerAdditionalHour != 0 ? 
+                parkingLot.PricePerAdditionalHour = parkingLotModel.PricePerAdditionalHour != 0 ?
                                                             parkingLotModel.PricePerAdditionalHour :
                                                             parkingLot.PricePerAdditionalHour;
                 parkingLot.PriceFirstHour = parkingLotModel.PriceFirstHour != 0 ?
@@ -170,7 +170,7 @@ namespace ASPNETCoreBackend.Services.Implementations
             if (parkingLot == null)
                 throw new KeyNotFoundException("Parking Lot not found");
 
-            Client client = _clientRepository.GetByFullName(parkingLotActivityModel.ClientFirstName, 
+            Client client = _clientRepository.GetByFullName(parkingLotActivityModel.ClientFirstName,
                                                             parkingLotActivityModel.ClientLastName);
             if (client == null)
                 throw new KeyNotFoundException("Client not found");
@@ -233,18 +233,18 @@ namespace ASPNETCoreBackend.Services.Implementations
             return viewActivity;
         }
 
-        public ParkingLotActivityViewModel EndParkingLotActivity(ParkingLotActivityModel parkingLotActivityModel)
+        public ParkingLotActivityViewModel EndParkingLotActivity(ParkingLotActivityFinishModel parkingLotActivityFinishModel)
         {
             ParkingLotActivity activity;
-            ParkingLot parkingLot = _parkingLotRepository.GetParkingLot(parkingLotActivityModel.ParkingLotName);
+            ParkingLot parkingLot = _parkingLotRepository.GetParkingLot(parkingLotActivityFinishModel.ParkingLotName);
 
             if (parkingLot == null)
                 throw new KeyNotFoundException("Parking Lot not found");
 
-            if (parkingLotActivityModel.ParkingLotActivityId == 0)
+            if (parkingLotActivityFinishModel.ParkingLotActivityId == 0)
             {
 
-                Vehicle vehicle = _vehicleRepository.GetVehicle(parkingLotActivityModel.VehiclePlateNumber);
+                Vehicle vehicle = _vehicleRepository.GetVehicle(parkingLotActivityFinishModel.VehiclePlateNumber);
                 if (vehicle == null)
                     throw new KeyNotFoundException("Vehicle not found");
 
@@ -254,16 +254,16 @@ namespace ASPNETCoreBackend.Services.Implementations
             else
             {
                 activity = _parkingLotActivityRepository
-                                .GetById(parkingLotActivityModel.ParkingLotActivityId);
+                                .GetById(parkingLotActivityFinishModel.ParkingLotActivityId);
             }
 
-            if (parkingLotActivityModel.EndDate == null)
+            if (parkingLotActivityFinishModel.EndDate == null)
             {
                 activity.EndDate = DateTime.UtcNow;
             }
             else
             {
-                activity.EndDate = parkingLotActivityModel.EndDate;
+                activity.EndDate = parkingLotActivityFinishModel.EndDate;
             }
 
             TimeSpan duration = (DateTime)activity.EndDate - activity.StartDate;
@@ -271,7 +271,7 @@ namespace ASPNETCoreBackend.Services.Implementations
             double additionalHours = duration.TotalHours - 1 > 0 ? duration.TotalHours - 1 : 0;
 
             activity.ParkingValue = parkingLot.PriceFirstHour + parkingLot.PricePerAdditionalHour * (decimal)additionalHours;
-            
+
             _parkingLotActivityRepository.UpdateParkingLotActivity(activity);
 
             return GetParkingLotActivityViewModel(activity);
@@ -280,7 +280,7 @@ namespace ASPNETCoreBackend.Services.Implementations
         public List<Vehicle> GetVehiclesAtParkingLot(string parkingLotName)
         {
             ParkingLot parkingLot = _parkingLotRepository.GetParkingLot(parkingLotName);
-            if (parkingLot == null) 
+            if (parkingLot == null)
                 throw new KeyNotFoundException("Parking Lot not found");
 
             return _parkingLotRepository.GetVehiclesByParkingLotId(parkingLot.ParkingLotId);
@@ -289,7 +289,7 @@ namespace ASPNETCoreBackend.Services.Implementations
         public List<VehicleViewModel> GetVehiclesOfClient(string firstName, string lastName)
         {
             Client client = _clientRepository.GetByFullName(firstName, lastName);
-            if (client == null) 
+            if (client == null)
                 throw new KeyNotFoundException("Client not found");
 
             return _vehicleRepository.GetVehiclesByClient(client.ClientId);

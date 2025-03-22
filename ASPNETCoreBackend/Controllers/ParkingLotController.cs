@@ -8,16 +8,29 @@ namespace ASPNETCoreBackend.Controllers
     public class ParkingLotController : Controller
     {
         private readonly IParkingLotManager _parkingLotManager;
+        private readonly ILogger<ParkingLotController> _logger;
 
-        public ParkingLotController(IParkingLotManager parkingLotManager)
+        public ParkingLotController(
+            IParkingLotManager parkingLotManager,
+            ILogger<ParkingLotController> logger
+        )
         {
             _parkingLotManager = parkingLotManager;
+            _logger = logger;
         }
 
         [HttpPost]
         [Route("new-parking-lot")]
         public IActionResult NewParkingLot([FromBody] ParkingLotModel parkingLotModel)
         {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Validation failed for new parking lot: {Errors}",
+                  string.Join("; ", ModelState.Values
+                      .SelectMany(v => v.Errors)
+                      .Select(e => e.ErrorMessage)));
+                return BadRequest(ModelState);
+            }
 
             try
             {
@@ -34,6 +47,15 @@ namespace ASPNETCoreBackend.Controllers
         [Route("new-client")]
         public IActionResult NewClient([FromBody] ClientModel clientModel)
         {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Validation failed for new client: {Errors}",
+                  string.Join("; ", ModelState.Values
+                      .SelectMany(v => v.Errors)
+                      .Select(e => e.ErrorMessage)));
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 _parkingLotManager.AddClient(clientModel);
@@ -49,6 +71,14 @@ namespace ASPNETCoreBackend.Controllers
         [Route("new-vehicle")]
         public IActionResult NewVehicle([FromBody] VehicleModel vehicleModel)
         {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Validation failed for new vehicle: {Errors}",
+                  string.Join("; ", ModelState.Values
+                      .SelectMany(v => v.Errors)
+                      .Select(e => e.ErrorMessage)));
+                return BadRequest(ModelState);
+            }
             try
             {
                 _parkingLotManager.AddVehicle(vehicleModel);
@@ -64,6 +94,14 @@ namespace ASPNETCoreBackend.Controllers
         [Route("new-activity")]
         public IActionResult NewActivity([FromBody] ParkingLotActivityModel parkingLotActivityModel)
         {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Validation failed for new vehicle: {Errors}",
+                  string.Join("; ", ModelState.Values
+                      .SelectMany(v => v.Errors)
+                      .Select(e => e.ErrorMessage)));
+                return BadRequest(ModelState);
+            }
             try
             {
                 _parkingLotManager.AddParkingLotActivity(parkingLotActivityModel);
@@ -77,11 +115,19 @@ namespace ASPNETCoreBackend.Controllers
 
         [HttpPut]
         [Route("end-activity")]
-        public IActionResult EndActivity([FromBody] ParkingLotActivityModel parkingLotActivityModel)
+        public IActionResult EndActivity([FromBody] ParkingLotActivityFinishModel parkingLotActivityFinishModel)
         {
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Validation failed for new vehicle: {Errors}",
+                  string.Join("; ", ModelState.Values
+                      .SelectMany(v => v.Errors)
+                      .Select(e => e.ErrorMessage)));
+                return BadRequest(ModelState);
+            }
             try
             {
-                ParkingLotActivityViewModel viewActivity = _parkingLotManager.EndParkingLotActivity(parkingLotActivityModel);
+                ParkingLotActivityViewModel viewActivity = _parkingLotManager.EndParkingLotActivity(parkingLotActivityFinishModel);
                 return Ok(viewActivity);
             }
             catch (Exception ex)
@@ -224,15 +270,15 @@ namespace ASPNETCoreBackend.Controllers
 
                 if (activities == null)
                     return NoContent();
-                
-                
+
+
                 foreach (ParkingLotActivity activity in activities)
                 {
                     ParkingLotActivityViewModel viewActivity = _parkingLotManager.GetParkingLotActivityViewModel(activity);
 
                     viewActivities.Add(viewActivity);
                 }
-                
+
                 return Ok(viewActivities);
             }
             catch (Exception ex)
@@ -240,6 +286,6 @@ namespace ASPNETCoreBackend.Controllers
                 return BadRequest(ex.Message);
             }
         }
-        
+
     }
 }

@@ -17,7 +17,7 @@ namespace ASPNETCoreBackend.Services.Interfaces
         void AddParkingLotActivity(ParkingLotActivityModel parkingLotActivityModel);
         void RemoveParkingLotActivity(ParkingLotActivityModel parkingLotActivityModel);
         ParkingLotActivityViewModel GetParkingLotActivityViewModel(ParkingLotActivity parkingLotActivity);
-        ParkingLotActivityViewModel EndParkingLotActivity(ParkingLotActivityModel parkingLotActivityModel);
+        ParkingLotActivityViewModel EndParkingLotActivity(ParkingLotActivityFinishModel parkingLotActivityFinishModel);
         List<Vehicle> GetVehiclesAtParkingLot(string parkingLotName);
         List<VehicleViewModel> GetVehiclesOfClient(string firstName, string lastName);
         List<ParkingLotActivity> GetParkingLotActivities(string parkingLotName);
