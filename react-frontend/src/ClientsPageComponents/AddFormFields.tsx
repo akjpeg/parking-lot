@@ -11,11 +11,37 @@ const initialClientFormData: ClientFormData = {
 
 function AddFormFields(): JSX.Element {
     const [formData, setFormData] = useState(initialClientFormData);
+    const [errors, setErrors] = useState({ phone: '', email: '' });
     const [submissionSuccess, setSubmissionSuccess] = useState(false);
     const [submissionFailure, setSubmissionFailure] = useState(false);
+
+    const validatePhone = (value: string) => {
+      const phoneRegex = /^\+55\d{2}\d{5}\d{4}$/;
+      if (!phoneRegex.test(value)) {
+        setErrors((prev) => ({ ...prev, phone: "Invalid phone format. Use +55XXXXXXXXXXX"}));
+      } else {
+        setErrors((prev) => ({ ...prev, phone: "" }));
+      }
+      setFormData((prev) => ({ ...prev, phone: value }));
+    }
+
+    const validateEmail = (value: string) => {
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+      if (!emailRegex.test(value)) {
+        setErrors((prev) => ({ ...prev, email: "Invalid email format" }));
+      } else {
+        setErrors((prev) => ({ ...prev, email: "" }));
+      }
+      setFormData((prev) => ({ ...prev, email: value }));
+    };
   
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+
+      if (errors.phone || errors.email) {
+        console.log("Fix validation errors before submitting");
+        return;
+      }
   
       try {
         const response = await fetch("/new-client", {
@@ -48,6 +74,7 @@ function AddFormFields(): JSX.Element {
             value={formData.firstName} 
             className="form-control col long-field" 
             id="form-client-firstname" 
+            placeholder="João"
             required 
             onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
           <label htmlFor="form-client-lastname">Enter client's last name:</label>
@@ -56,6 +83,7 @@ function AddFormFields(): JSX.Element {
             value={formData.lastName} 
             className="form-control col long-field" 
             id="form-client-lastname" 
+            placeholder="Fulano"
             required 
             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
           <label htmlFor="form-client-phone">Enter client's phone number:</label>
@@ -64,15 +92,19 @@ function AddFormFields(): JSX.Element {
             value={formData.phone}
             className="form-control col short-field" 
             id="form-client-phone" 
+            placeholder="+5511987654321"
             required 
-            onChange={(e) => setFormData({ ...formData, phone: e.target.value })} />
+            onChange={(e) => validatePhone(e.target.value)} />
+            {errors.phone && <p style={{ color: "red" }}>{errors.phone}</p>}
           <label htmlFor="form-client-email">Enter client's email:</label>
           <input 
             type="text" 
             value={formData.email}
             className="form-control col short-field"
             id="form-client-email" 
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+            placeholder="email@email.com.br"
+            onChange={(e) => validateEmail(e.target.value)} />
+            {errors.email && <p style={{ color: "red" }}>{errors.email}</p>}
           <button type="submit" className="col-4 btn btn-primary">Submit</button>
         </form>
   
