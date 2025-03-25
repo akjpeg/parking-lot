@@ -11,9 +11,24 @@ const initialClientFormData: ClientFormData = {
 
 function AddFormFields(): JSX.Element {
     const [formData, setFormData] = useState(initialClientFormData);
-    const [errors, setErrors] = useState({ phone: '', email: '' });
+    const [errors, setErrors] = useState({ firstName: '', lastName: '', phone: '', email: '' });
     const [submissionSuccess, setSubmissionSuccess] = useState(false);
     const [submissionFailure, setSubmissionFailure] = useState(false);
+
+    const validateName = (field: "firstName" | "lastName", value: string) => {
+      const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ' -]{2,50}$/;
+    
+      if (!nameRegex.test(value.trim())) {
+        setErrors((prev) => ({
+          ...prev,
+          [field]: "Invalid name format (only letters, spaces, hyphens allowed)",
+        }));
+      } else {
+        setErrors((prev) => ({ ...prev, [field]: "" }));
+      }
+    
+      setFormData((prev) => ({ ...prev, [field]: value }));
+    };
 
     const validatePhone = (value: string) => {
       const phoneRegex = /^\+55\d{2}\d{5}\d{4}$/;
@@ -76,7 +91,8 @@ function AddFormFields(): JSX.Element {
             id="form-client-firstname" 
             placeholder="João"
             required 
-            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })} />
+            onChange={(e) => validateName("firstName", e.target.value)} />
+            {errors.firstName && <p style={{ color: "red" }}>{errors.firstName}</p>}
           <label htmlFor="form-client-lastname">Enter client's last name:</label>
           <input 
             type="text" 
@@ -85,7 +101,8 @@ function AddFormFields(): JSX.Element {
             id="form-client-lastname" 
             placeholder="Fulano"
             required 
-            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })} />
+            onChange={(e) => validateName("lastName", e.target.value)} />
+            {errors.firstName && <p style={{ color: "red" }}>{errors.firstName}</p>}
           <label htmlFor="form-client-phone">Enter client's phone number:</label>
           <input 
             type="text" 
