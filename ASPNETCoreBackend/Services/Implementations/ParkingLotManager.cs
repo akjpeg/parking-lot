@@ -203,7 +203,7 @@ namespace ASPNETCoreBackend.Services.Implementations
                                                                             parkingLotActivityModel.ParkingLotName);
 
             if (parkingLotActivity != null)
-                throw new Exception("Vehicle is already parked");
+                throw new InvalidOperationException("Vehicle is already parked");
 
 
             ParkingLotActivity activity = new ParkingLotActivity

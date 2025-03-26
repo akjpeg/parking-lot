@@ -12,8 +12,19 @@ const initialActivityFormData: ActitivyFormData = {
 
 function AddFormFields(): JSX.Element {
     const [formData, setFormData] = useState(initialActivityFormData);
+    const [errors, setErrors] = useState({ vehiclePlateNumber: "" });
     const [submissionSuccess, setSubmissionSuccess] = useState(false);
     const [submissionFailure, setSubmissionFailure] = useState(false);
+
+    const validatePlate = (value: string) => {
+      const plateRegex = /^[A-Z]{3}\d{4}$|^[A-Z]{3}\d[A-Z]\d{2}$/i;
+      if (!plateRegex.test(value.trim())) {
+        setErrors((prev) => ({ ...prev, vehiclePlateNumber: "Invalid plate number format. Use ABC1234 or ABC1A23"}));
+      } else {
+        setErrors((prev) => ({ ...prev, vehiclePlateNumber: "" }));
+      }
+      setFormData((prev) => ({ ...prev, vehiclePlateNumber: value }));
+    }
   
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -26,6 +37,16 @@ function AddFormFields(): JSX.Element {
           },
           body: JSON.stringify(formData)
         });
+
+        if (response.status === 409) {
+          setSubmissionSuccess(false);
+          setSubmissionFailure(true);
+          setErrors((prev) => ({
+            ...prev,
+            vehiclePlateNumber: "A vehicle with this plate number is already parked.",
+          }));
+          return;
+        }
   
         if (!response.ok) {
           throw new Error("Failed to add client");
@@ -57,8 +78,9 @@ function AddFormFields(): JSX.Element {
             value={formData.vehiclePlateNumber}
             className="form-control col short-field" 
             id="form-activity-platenumber" 
-            onChange={(e) => setFormData({ ...formData, vehiclePlateNumber: e.target.value })} 
-            required />
+            required
+            onChange={(e) => validatePlate(e.target.value)} />
+            { errors.vehiclePlateNumber && <p style={{ color: "red" }}>{errors.vehiclePlateNumber}</p>}
           <label htmlFor="form-activity-firstname">Enter client's first name:</label>
           <input 
             type="text" 
