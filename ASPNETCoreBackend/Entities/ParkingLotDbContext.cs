@@ -2,7 +2,7 @@
 
 namespace ASPNETCoreBackend.Entities
 {
-    public class ParkingLotDbContext: DbContext
+    public class ParkingLotDbContext : DbContext
     {
         public ParkingLotDbContext(DbContextOptions<ParkingLotDbContext> options) : base(options) { }
 
@@ -21,6 +21,10 @@ namespace ASPNETCoreBackend.Entities
                 .Property(c => c.RegistrationDate)
                 .ValueGeneratedOnAdd()
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            modelBuilder.Entity<Client>()
+                .HasIndex(c => c.PhoneNumber)
+                .IsUnique();
 
             modelBuilder.Entity<ParkingLotActivity>()
                 .Property(c => c.StartDate)

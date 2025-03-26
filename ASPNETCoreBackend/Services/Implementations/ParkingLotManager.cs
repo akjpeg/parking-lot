@@ -2,6 +2,7 @@
 using ASPNETCoreBackend.Models;
 using ASPNETCoreBackend.Repositories.Interfaces;
 using ASPNETCoreBackend.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace ASPNETCoreBackend.Services.Implementations
@@ -26,6 +27,12 @@ namespace ASPNETCoreBackend.Services.Implementations
 
         public void AddClient(ClientModel clientModel)
         {
+            Client existingClient = _clientRepository.GetByPhoneNumber(clientModel.Phone);
+            if (existingClient != null)
+            {
+                throw new InvalidOperationException("A client with this phone number already exists");
+            }
+
             Client client = new Client
             {
                 FirstName = clientModel.FirstName,

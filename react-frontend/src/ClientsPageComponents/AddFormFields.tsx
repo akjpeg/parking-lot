@@ -66,6 +66,16 @@ function AddFormFields(): JSX.Element {
           },
           body: JSON.stringify(formData)
         });
+
+        if (response.status === 409) {
+          setSubmissionSuccess(false);
+          setSubmissionFailure(true);
+          setErrors((prev) => ({
+            ...prev,
+            phone: "A client with this phone number is already registered.",
+          }));
+          return;
+        }
   
         if (!response.ok) {
           throw new Error("Failed to add client");
@@ -133,7 +143,7 @@ function AddFormFields(): JSX.Element {
   
         {submissionFailure && (
           <div className="alert alert-danger" role="alert">
-            Failed to add client's data. Please try again.
+            Failed to add client's data. Please verify the error and try again.
           </div>
         )}
       </>

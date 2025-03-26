@@ -61,6 +61,10 @@ namespace ASPNETCoreBackend.Controllers
                 _parkingLotManager.AddClient(clientModel);
                 return Ok();
             }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { ex.Message });
+            }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);

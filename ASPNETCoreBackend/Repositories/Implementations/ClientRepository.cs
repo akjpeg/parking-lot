@@ -32,10 +32,17 @@ namespace ASPNETCoreBackend.Repositories.Implementations
             return client;
         }
 
+        public Client GetByPhoneNumber(string phoneNumber)
+        {
+            Client client = _context.Clients.FirstOrDefault(c => c.PhoneNumber == phoneNumber);
+
+            return client;
+        }
+
         public void RemoveClient(Client client)
         {
             _context.Clients.Remove(client);
-            _context.SaveChanges();  
+            _context.SaveChanges();
         }
 
         public void UpdateClient(Client client)
