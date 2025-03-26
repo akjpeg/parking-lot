@@ -37,6 +37,10 @@ namespace ASPNETCoreBackend.Controllers
                 _parkingLotManager.AddParkingLot(parkingLotModel);
                 return Ok();
             }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new { ex.Message });
+            }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);

@@ -46,6 +46,12 @@ namespace ASPNETCoreBackend.Services.Implementations
 
         public void AddParkingLot(ParkingLotModel parkingLotModel)
         {
+            ParkingLot existingParkingLot = _parkingLotRepository.GetParkingLot(parkingLotModel.Name);
+            if (existingParkingLot != null)
+            {
+                throw new InvalidOperationException("A parking lot with the same name already exists");
+            }
+
             ParkingLot parkingLot = new ParkingLot
             {
                 Name = parkingLotModel.Name,

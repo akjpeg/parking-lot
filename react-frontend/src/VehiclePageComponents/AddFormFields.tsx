@@ -50,6 +50,16 @@ function AddFormFields(): JSX.Element {
           },
           body: JSON.stringify(formData)
         });
+
+        if (response.status === 409) {
+          setSubmissionSuccess(false);
+          setSubmissionFailure(true);
+          setErrors((prev) => ({
+            ...prev,
+            plateNumber: "This plate number is already registered.",
+          }));
+          return;
+        }
   
         if (!response.ok) {
           throw new Error("Failed to add client");

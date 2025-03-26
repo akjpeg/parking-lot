@@ -11,6 +11,7 @@ const initialParkingLotFormData: ParkingLotFormData = {
 
 function AddFormFields(): JSX.Element {
     const [formData, setFormData] = useState(initialParkingLotFormData);
+    const [errors, setErrors] = useState({ name: "" });
     const [submissionSuccess, setSubmissionSuccess] = useState(false);
     const [submissionFailure, setSubmissionFailure] = useState(false);
   
@@ -25,6 +26,16 @@ function AddFormFields(): JSX.Element {
           },
           body: JSON.stringify(formData)
         });
+
+        if (response.status === 409) {
+          setSubmissionSuccess(false);
+          setSubmissionFailure(true);
+          setErrors((prev) => ({
+            ...prev,
+            name: "A parking lot of the same name is already registered.",
+          }));
+          return;
+        }
   
         if (!response.ok) {
           throw new Error("Failed to add parking lot");
@@ -50,6 +61,7 @@ function AddFormFields(): JSX.Element {
             id="form-parking-lot-name" 
             required 
             onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+            {errors.name && <p style={{ color: "red" }}>{errors.name}</p>}
           <label htmlFor="form-parking-lot-address">Enter Parking Lot Address:</label>
           <input 
             type="text" 
