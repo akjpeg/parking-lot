@@ -61,10 +61,15 @@ namespace ASPNETCoreBackend.Services.Implementations
         {
 
             Client client = _clientRepository.GetByFullName(vehicleModel.ClientFirstName, vehicleModel.ClientLastName);
-
             if (client == null)
             {
                 throw new KeyNotFoundException("Client is not registered");
+            }
+
+            Vehicle existingVehicle = _vehicleRepository.GetVehicle(vehicleModel.PlateNumber);
+            if (existingVehicle != null)
+            {
+                throw new InvalidOperationException("Plate number is already registered");
             }
 
             Vehicle vehicle = new Vehicle

@@ -14,8 +14,30 @@ const initialVehicleFormData: VehicleFormData = {
 
 function AddFormFields(): JSX.Element {
     const [formData, setFormData] = useState(initialVehicleFormData);
+    const [errors, setErrors] = useState({ plateNumber: "", color: "" });
     const [submissionSuccess, setSubmissionSuccess] = useState(false);
     const [submissionFailure, setSubmissionFailure] = useState(false);
+
+    const validatePlate = (value: string) => {
+      const plateRegex = /^[A-Z]{3}\d{4}$|^[A-Z]{3}\d[A-Z]\d{2}$/i;
+      if (!plateRegex.test(value.trim())) {
+        setErrors((prev) => ({ ...prev, plateNumber: "Invalid plate number format. Use ABC1234 or ABC1A23"}));
+      } else {
+        setErrors((prev) => ({ ...prev, plateNumber: "" }));
+      }
+      setFormData((prev) => ({ ...prev, plateNumber: value }));
+    }
+
+    const validateColor = (value: string) => {
+      const colorRegex = /^(?!\d+$)[A-Za-zÀ-ÖØ-öø-ÿ\s-]+$/;
+
+      if (!colorRegex.test(value.trim())) {
+        setErrors((prev) => ({ ...prev, color: "Color text must not contains numbers on it"}));
+      } else {
+        setErrors((prev) => ({ ...prev, color: "" }));
+      }
+      setFormData((prev) => ({ ...prev, color: value }));
+    }
   
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -51,8 +73,10 @@ function AddFormFields(): JSX.Element {
             value={formData.plateNumber} 
             className="form-control col short-field" 
             id="form-vehicle-platenumber" 
+            placeholder="ABC1234"
             required 
-            onChange={(e) => setFormData({ ...formData, plateNumber: e.target.value })} />
+            onChange={(e) => validatePlate(e.target.value)} />
+            { errors.plateNumber && <p style={{ color: "red" }}>{errors.plateNumber}</p>}
           <label htmlFor="form-vehicle-brand">Enter vehicle's brand:</label>
           <input 
             type="text" 
@@ -75,7 +99,8 @@ function AddFormFields(): JSX.Element {
             value={formData.color}
             className="form-control col short-field" 
             id="form-vehicle-color" 
-            onChange={(e) => setFormData({ ...formData, color: e.target.value })} />
+            onChange={(e) => validateColor(e.target.value)} />
+            { errors.color && <p style={{ color: "red" }}>{errors.color}</p>}
           <label htmlFor="form-vehicle-year">Enter vehicle's year:</label>
           <input 
             type="number" 
