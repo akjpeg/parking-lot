@@ -13,16 +13,19 @@ namespace ASPNETCoreBackend.Services.Implementations
         private readonly IVehicleRepository _vehicleRepository;
         private readonly IParkingLotRepository _parkingLotRepository;
         private readonly IParkingLotActivityRepository _parkingLotActivityRepository;
+        private readonly ILogger<ParkingLotManager> _logger;
 
         public ParkingLotManager(IClientRepository clientRepository,
                                  IVehicleRepository vehicleRepository,
                                  IParkingLotRepository parkingLotRepository,
-                                 IParkingLotActivityRepository parkingLotActivityRepository)
+                                 IParkingLotActivityRepository parkingLotActivityRepository,
+                                 ILogger<ParkingLotManager> logger)
         {
             _clientRepository = clientRepository;
             _vehicleRepository = vehicleRepository;
             _parkingLotRepository = parkingLotRepository;
             _parkingLotActivityRepository = parkingLotActivityRepository;
+            _logger = logger;
         }
 
         public void AddClient(ClientModel clientModel)
@@ -30,6 +33,7 @@ namespace ASPNETCoreBackend.Services.Implementations
             Client existingClient = _clientRepository.GetByPhoneNumber(clientModel.Phone);
             if (existingClient != null)
             {
+                _logger.LogError($"Client with the phone number {clientModel.Phone} is already registered");
                 throw new InvalidOperationException("A client with this phone number already exists");
             }
 
@@ -49,6 +53,7 @@ namespace ASPNETCoreBackend.Services.Implementations
             ParkingLot existingParkingLot = _parkingLotRepository.GetParkingLot(parkingLotModel.Name);
             if (existingParkingLot != null)
             {
+                _logger.LogError($"Parking lot with the name {parkingLotModel.Name} is already registered");
                 throw new InvalidOperationException("A parking lot with the same name already exists");
             }
 
@@ -75,6 +80,7 @@ namespace ASPNETCoreBackend.Services.Implementations
             Vehicle existingVehicle = _vehicleRepository.GetVehicle(vehicleModel.PlateNumber);
             if (existingVehicle != null)
             {
+                _logger.LogError($"Vehicle with the plate {vehicleModel.PlateNumber} is already registered");
                 throw new InvalidOperationException("Plate number is already registered");
             }
 
